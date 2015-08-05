@@ -10,7 +10,7 @@
 #define SHLink_Packet_h
 
 #define _UINT8          unsigned char
-
+ //请求及响应头部想着字段
 #define VERSION_LEN     4
 #define TYPE_LEN        4
 #define MAC_LEN         8
@@ -29,7 +29,7 @@
 #define SHPacketType_ChallengeReply 0x00000201
 #define SHPacketType_Control        0x00000300
 #define SHPacketType_ControlReply   0x00000301
-
+//请求类型
 #define SHRequestType_GetClientList         1
 #define SHRequestType_SetSsid               2
 #define SHRequestType_SetWan                3
@@ -39,8 +39,19 @@
 #define SHRequestType_CheckFirmwareUpdate   7
 #define SHRequestType_UpdateFirmware        8
 #define SHRequestType_GetFirmwareLog        9
-#define SHRequestType_GetWlanSchedule       10
+#define SHRequestType_SetWlanSchedule       10
+#define SHRequestType_GetWifiClockInfo      11
 #define SHRequestType_PowerOff              12
+#define SHRequestType_GetSlaveList          13
+#define SHRequestType_GetTerminalWithMac    14
+#define SHRequestType_GetWanInfo            15
+#define SHRequestType_SetClientName         16
+#define SHRequestType_SetPanrentControlInfo 17
+#define SHRequestType_getParentControlInfo 18
+#define SHRequestType_AddOrDeleteParentControl 19
+#define SHRequestType_GetOnlineWay 20
+#define SHRequestType_GoToFactory 21
+#define SHRequestType_BackupOrRestore 22
 
 #define SHControlStatus_Success  0
 #define SHControlStatus_UserNotExist  3

@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "SearchViewController.h"
 @interface LoginViewController : UIViewController
-
+-(void)setSearchViewController:(SearchViewController*)controller;
 @end

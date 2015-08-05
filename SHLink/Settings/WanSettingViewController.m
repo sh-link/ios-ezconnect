@@ -11,7 +11,9 @@
 #import "PppoeSettingViewController.h"
 #import "DhcpSettingViewController.h"
 #import "StaticIpSettingViewController.h"
-
+#import "SHRouter.h"
+#import "DetectView.h"
+#import "UIView+Extension.h"
 typedef enum : NSInteger {
     SlideFromLeft,
     SlideFromRight
@@ -19,8 +21,9 @@ typedef enum : NSInteger {
 
 @interface WanSettingViewController ()<SHSlideMenuDelegate>
 
-@property (weak, nonatomic) IBOutlet SHSlideMenu *slideMenu;
-@property (weak, nonatomic) IBOutlet UIView *placeHoderView;
+@property (strong, nonatomic) IBOutlet SHSlideMenu *slideMenu;
+@property (strong, nonatomic) DetectView *detectView;
+@property (strong, nonatomic) IBOutlet UIView *placeHoderView;
 
 @end
 
@@ -29,33 +32,47 @@ typedef enum : NSInteger {
     PppoeSettingViewController *_pppoeVC;
     DhcpSettingViewController *_dhcpVC;
     StaticIpSettingViewController *_staticVC;
-    
     UIViewController *_currentViewController;
-    
+}
+
+-(void)viewWillAppear:(BOOL)animated
+{
+    [_detectView startAnimation];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    _slideMenu = [[SHSlideMenu alloc]init];
+    _placeHoderView = [[UIView alloc]init];
+    _detectView = [[DetectView alloc]init];
+    
+    [self.view addSubview:_slideMenu];
+    [self.view addSubview:_placeHoderView];
+    [self.view addSubview:_detectView];
+    
+    _slideMenu.delegate = self;
+    _slideMenu.frame = CGRectMake(0, 0, self.view.frame.size.width, 70);
+    _detectView.frame = CGRectMake(40, CGRectGetMaxY(_slideMenu.frame) + 10, self.view.frame.size.width - 80, _detectView.height);
+    _placeHoderView.frame = CGRectMake(0, CGRectGetMaxY(_detectView.frame) , self.view.frame.size.width, self.view.frame.size.height);
+    
+    
     _slideMenu.menuArray = @[@"PPPOE",@"DHCP",@"静态IP"];
     _slideMenu.delegate = self;
-    
     _placeHoderView.backgroundColor = [UIColor clearColor];
-    
     _pppoeVC = [self.storyboard instantiateViewControllerWithIdentifier:@"pppoeVC"];
     _dhcpVC = [self.storyboard instantiateViewControllerWithIdentifier:@"dhcpVC"];
     _staticVC = [self.storyboard instantiateViewControllerWithIdentifier:@"staticVC"];
-    
     [self addChildViewController:_pppoeVC];
-    [_pppoeVC didMoveToParentViewController:self];
+    //[_pppoeVC didMoveToParentViewController:self];
     _pppoeVC.view.tag = 2000;
     
     [self addChildViewController:_dhcpVC];
-    [_dhcpVC didMoveToParentViewController:self];
+    //[_dhcpVC didMoveToParentViewController:self];
     _dhcpVC.view.tag = 2001;
     
     [self addChildViewController:_staticVC];
-    [_staticVC didMoveToParentViewController:self];
+    //[_staticVC didMoveToParentViewController:self];
     _staticVC.view.tag = 2002;
     
     _pppoeVC.view.frame = self.placeHoderView.bounds;
@@ -63,12 +80,19 @@ typedef enum : NSInteger {
     
     _currentViewController = _pppoeVC;
     
+    //获取当前wan口用户类型
+    NSNumber* type = [SHRouter currentRouter].wanInfo[@"WAN_TYPE"];
+    if(type == nil)
+    {
+        return;
+    }
+    int wan_type = [type intValue];
+    
+    [_slideMenu selectItem:(wan_type + 1) % 3];
+  
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
+
 
 - (void)replaceViewController:(UIViewController *)childToRemove withViewController:(UIViewController *)childToAdd {
     

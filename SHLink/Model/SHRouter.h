@@ -16,190 +16,191 @@ typedef NS_ENUM(int, _WanConfigType) {
 
 @interface SHRouter : SHDevice
 
-//a puppy die for that, sorry
+@property (nonatomic, copy) NSString* selfMac;
+
 @property (nonatomic) BOOL loginNeedDismiss;
 
-//another puppy die.
 @property (nonatomic) BOOL directLogin;
 
-/**
- *  Router's tcp socket addr, used to test reachability.
- */
 @property (nonatomic) struct sockaddr_in hostAddr;
 
-/**
- *  Port we connect to communicate with router.
- */
 @property (nonatomic) unsigned short tcpPort;
 
-/**
- *  Clist list of the router, call getClientListWithError: to refresh.
- */
-@property (nonatomic, retain) NSArray *clientList;
+@property (nonatomic, copy) NSMutableArray *clientList;
 
-/**
- *  Is the wan port connected
- */
+@property (nonatomic, copy) NSArray *SlaveList;
+
 @property (nonatomic) BOOL wanIsConnected;
 
-/**
- *  Lan ip mask
- */
-@property (nonatomic) NSString *LanMask;
+@property (nonatomic, copy) NSString *LanMask;
 
-/**
- *  Wan ip mask
- */
-@property (nonatomic) NSString *wanMask;
+@property (nonatomic, copy) NSString *wanMask;
 
-/**
- *  Wan ip gateway
- */
-@property (nonatomic) NSString *wanGateway;
+@property (nonatomic, copy) NSString *wanGateway;
 
-/**
- *  IP DNS address
- */
-@property (nonatomic) NSString *dns1;
+@property (nonatomic, copy) NSString *dns1;
 
-/**
- *  IP DNS backup address
- */
-@property (nonatomic) NSString *dns2;
+@property (nonatomic, copy) NSString *dns2;
 
-/**
- *  Packet num router has sent.
- */
+@property (nonatomic, assign) int WAN_INET_STAT;
+
 @property (nonatomic) long long txPktNum;
 
-/**
- *  Packet num router has recrived.
- */
 @property (nonatomic) long long rxPktNum;
 
-/**
- *  Wifi ssid
- */
-@property (nonatomic) NSString *ssid;
+@property (nonatomic) NSString *current_online_way;
 
-/**
- *  Wifi channel
- */
+@property (nonatomic, copy) NSString *ssid;
+
 @property (nonatomic) int channel;
 
-/**
- *  Wifi key
- */
-@property (nonatomic) NSString *wifiKey;
+@property (nonatomic, copy) NSString *wifiKey;
 
-/**
- *  Router's current wan config type.
- */
 @property (nonatomic) _WanConfigType currentWanCfgType;
 
-/**
- *  PPPoE username
- */
-@property (nonatomic) NSString *pppoeUsername;
+@property (nonatomic, strong) NSString *pppoeUsername;
 
-/**
- *  PPPoE Password
- */
-@property (nonatomic) NSString *pppoePassword;
+@property (nonatomic, strong) NSString *pppoePassword;
 
-/**
- *  Get the shared instance of SHRouter.
- *
- *  @return The shared instance.
- */
+@property (nonatomic) int onlineWay;
+
+@property (nonatomic, copy) NSString * onlineWayStr;
+
+//wifi定时相关信息
+@property (nonatomic, strong) NSMutableArray* wifiClocks;
+@property (nonatomic) BOOL  wlanSchedState;
+
+//父母控制定时相关信息
+@property (nonatomic, strong) NSMutableArray* parentControlWifiClocks;
+@property (nonatomic) BOOL parentControlWlanSchedState;
+
+
+@property (nonatomic, strong) NSDictionary* wanInfo;
+
+
+//获取路由器实例，单例
 +(instancetype)currentRouter;
-
+//更新路由器信息
 - (BOOL)updateRouterInfo;
-
 /**
- *  Get router's latest client list, which will update the clientList property.
- *
- *  @param error nil if success.
- *
- *  @return client list array.
+ *获取处于父母控制列表中的设备
  */
-- (NSArray *)getClientListWithError:(NSError **)error;
-
+-(NSMutableArray*)getDevicesInParentControl:(NSError **)error;
 /**
- *  Get router's current network setting info, if success, will update properties.
- *
- *  @param error error
- *
- *  @return Info dic if success, nil if failed.
+ *获取mac地址为mac的路由器上的终端设备列表
+ */
+-(NSMutableArray*)getTerminalWithMac:(NSString*)mac error:(NSError**)error;
+/**
+ *获取主路由器上的终端列表
+ */
+- (NSMutableArray *)getClientListWithError:(NSError **)error;
+/**
+ *获取slave路由器列表
+ */
+-(NSArray *)getSlaveListWithError:(NSError**)error;
+/**
+ *获取网络信息
  */
 - (NSDictionary *)getNetworkSettingInfoWithError:(NSError **)error;
-
 /**
- *  Set router's login account.
- *
- *  @param username New username to set.
- *  @param password New password to set.
- *  @param error    error
- *
- *  @return YES if success.
+ *设置路由器登陆账号和密码
  */
 - (BOOL)setRouterAccountWithUsername:(NSString *)username Password:(NSString *)password WithError:(NSError **)error;
-
 /**
- *  Set router's WiFi, if success, will update properties.
- *
- *  @param ssid    New ssid to set.
- *  @param key     New WiFi key to set.
- *  @param channel New WiFi channel to set, 0 means auto.
- *  @param error   error
- *
- *  @return YES if success.
+ *设置wifi名称，连接密码和通信信道
  */
 - (BOOL)setWifiWithSsid:(NSString *)ssid WifiKey:(NSString *)key Channel:(int)channel Error:(NSError **)error;
-
 /**
- *  Set router's lan config, if success, will update properties.
- *
- *  @param ip    Ip address to set.
- *  @param mask  Mask address to set.
- *  @param error Error
- *
- *  @return YES if success.
+ *设置lan端口ip地址,mask掩码
  */
 - (BOOL)setLanIP:(NSString *)ip Mask:(NSString *)mask Error:(NSError **)error;
-
 /**
- *  Set router's wan type to PPPoE.
- *
- *  @param pppoeUsername PPPoE username
- *  @param pppoePassword PPPoE password
- *  @param error         Error
- *
- *  @return YES if success.
+ *pppoe拨号设置
  */
 - (BOOL)setWanPPPoEWithUsername:(NSString *)pppoeUsername Password:(NSString *)pppoePassword Error:(NSError **)error;
 
 /**
- *  Set router's wan type to DHCP.
- *
- *  @param error Error
- *
- *  @return YES if success.
+ *获取pppoe拔号信息
+ */
+-(NSDictionary *)getWanInfo:(NSError **)error;
+/**
+ *dhcp设置
  */
 - (BOOL)setWanDHCPWithError:(NSError **)error;
 
 /**
- *  Set router's wan type to static ip.
- *
- *  @param wanIp      Wan ip address
- *  @param wanMask    Wan mask address
- *  @param wanGateway Wan getway address
- *  @param dns1       DNS address
- *  @param dns2       Backup DNS address
- *  @param error      Error
- *
- *  @return YES if success.
+ *静态ip设置
  */
 - (BOOL)setWanStaticIPWithIP:(NSString *)wanIp Mask:(NSString *)wanMask Gateway:(NSString *)wanGateway Dns1:(NSString *)dns1 Dns2:(NSString *)dns2 Error:(NSError **)error;
+
+/**
+ *关闭路由器
+ */
+-(BOOL)closeRouter:(NSError**)error;
+
+/**
+ *获取wifi定时信息，获取的信息存在SHRouter成员变量中
+ */
+-(BOOL)getWifiClockInfo:(NSError**)error;
+
+/**
+ *设置wifi定时信息
+ */
+-(BOOL)setUpWifiClock:(NSNumber*)wlanSchedStateParam wlanSched:(NSArray*) wlanSched error:(NSError**)error;
+/**
+ *获取父母控制时间设置信息
+ */
+-(BOOL)getParentClockInfo:(NSError **)error;
+/**
+ *设置家长控制定时信息
+ */
+-(BOOL)setUpPCWifiClock:(NSNumber*)wlanSchedStateParam wlanSched:(NSArray*) wlanSched error:(NSError**)error;
+/**
+ *获取操作系统版本信息,type指示主路由器或者从路由器
+ */
+-(NSDictionary*)getOSVersionInfo:(int)type error:(NSError**)error;
+
+/**
+ *更新路由器固件, type指示主路由器或从路由器
+ */
+-(NSDictionary*)updateFireWare:(int)type error:(NSError**)error;
+/**
+ *给终端重命名
+ */
+-(BOOL)setClientName:(NSString *)newName mac:(NSString*)mac error:(NSError**)error;
+/**
+ *添加一个设备到父母控制列表
+ */
+-(BOOL)addClientToParentControl:(NSString*)mac name:(NSString*)name error:(NSError**)error;
+
+/**
+ *从父母控制列表里删除一个设备
+ */
+-(BOOL)deleteClientFromParentControl:(NSString*)mac name:(NSString*)name error:(NSError**)error;
+/**
+ *从父母控制列表中删除一批设备
+ */
+-(BOOL)deleteClients:(NSArray *)clients error:(NSError**)error;
+/**
+ *添加一批设备到父母控制列表中
+ */
+-(BOOL)addCLients:(NSArray*)clients error:(NSError**)error;
+/**
+ *获取所有的路由器上的终端设备，路由器返回的所有设备有时会有重复的，需要自己处理，去除重复
+ */
+-(NSMutableArray*)getAllClient:(NSError**)error;
+
+/**
+ *获取当前上网方式
+ */
+-(BOOL)getOnlineWay:(NSError **)error;
+-(NSDictionary*)detectOnlineWay:(NSError **)error;
+
+/**
+ *获取需要备份的参数信息
+ **/
+-(NSString*)getBackupInfo:(NSError **)error;
+
+-(BOOL)restoreBackupInfo:(NSError **)error;
 
 @end

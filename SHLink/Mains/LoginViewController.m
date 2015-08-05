@@ -13,6 +13,8 @@
 #import "SHRouter.h"
 #import "SHDeviceConnector.h"
 #import "AccountControlTool.h"
+#import "HomeViewController.h"
+#import "Utils.h"
 
 @interface LoginViewController ()
 @property (weak, nonatomic) IBOutlet UIImageView *backgroundImageView;
@@ -25,9 +27,11 @@
 @end
 
 @implementation LoginViewController
+{
+    SearchViewController *_searchViewController;
+}
 
 - (void)viewDidLoad {
-    
     [super viewDidLoad];
     
     [self setup];
@@ -49,13 +53,13 @@
 
 - (void)setup {
     
-    UIBlurEffect *blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
-    UIVisualEffectView *effectview = [[UIVisualEffectView alloc] initWithEffect:blur];
-    [_backgroundImageView addSubview:effectview];
-    [effectview autoPinEdgesToSuperviewEdgesWithInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
+//    UIBlurEffect *blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+//    UIVisualEffectView *effectview = [[UIVisualEffectView alloc] initWithEffect:blur];
+//    [_backgroundImageView addSubview:effectview];
+//    [effectview autoPinEdgesToSuperviewEdgesWithInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
     
-    _usernameTF.shLeftImage = [UIImage imageNamed:@"iconTest3"];
-    _pswTF.shLeftImage = [UIImage imageNamed:@"iconTest3"];
+    _usernameTF.shLeftImage = [UIImage imageNamed:@"login"];
+    _pswTF.shLeftImage = [UIImage imageNamed:@"password"];
     
     _confirmButton.shFont = [UIFont fontWithName:@"Helvetica" size:19.0];
     
@@ -86,6 +90,7 @@
 }
 
 
+
 - (IBAction)login:(id)sender {
     
     [[UIApplication sharedApplication] sendAction:@selector(resignFirstResponder) to:nil from:nil forEvent:nil];
@@ -113,30 +118,31 @@
                 [SHRouter currentRouter].password = _pswTF.text;
                 
                 [AccountControlTool storageUserName:_usernameTF.text Password:_pswTF.text ForMac:[SHRouter currentRouter].mac];
-                
-                [self performSegueWithIdentifier:@"loginToHomeSegue" sender:self];
-                
+             
+                if(_searchViewController != nil)
+                {
+                   
+                    [_searchViewController performSegueWithIdentifier:@"search2HomeSegue" sender:self];
+                    [self dismissViewControllerAnimated:YES completion:^{
+                    }];
+                }
             } else if (error) {
         
-                switch (error.code) {
-                    case SHerror_Command_Failed:
-                    case SHError_Socket_Error:
-                        alert = [[UIAlertView alloc] initWithTitle:SHAlert_Head message:SHAlert_LoginFaild delegate:nil cancelButtonTitle:SHAlert_OK otherButtonTitles:nil, nil];
-                        [alert show];
-                        break;
-                    case SHerror_Timeout:
-                    case SHError_Unreachable:
-                        alert = [[UIAlertView alloc] initWithTitle:SHAlert_Head message:SHAlert_LoginUnreachable delegate:nil cancelButtonTitle:SHAlert_OK otherButtonTitles:nil, nil];
-                        [alert show];
-                        break;
-                    case SHError_User_Not_Exist:
-                        [_usernameTF shakeWithText:@"用户名不存在"];
-                        break;
-                    case SHerror_Wrong_Password:
-                        [_pswTF shakeWithText:@"登陆密码错误"];
-                        break;
-                    default:
-                        break;
+                if(error.code == SHError_User_Not_Exist)
+                {
+                     [_usernameTF shakeWithText:@"用户名不存在"];
+                }
+                else if(error.code == SHError_Wrong_Password)
+                {
+                    [_pswTF shakeWithText:@"登陆密码错误"];
+                }
+                else
+                {
+                    [self dismissViewControllerAnimated:YES
+                                             completion:^{
+                                                 //
+                                             }];
+                    [Utils showToast:@"网络故障，登陆失败" viewController:[UIApplication sharedApplication].keyWindow.rootViewController];
                 }
             }
             else {
@@ -177,7 +183,9 @@
     }
 }
 
-
-
+-(void)setSearchViewController:(SearchViewController *)controller
+{
+    _searchViewController = controller;
+}
 
 @end

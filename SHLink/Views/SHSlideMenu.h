@@ -15,6 +15,8 @@
 @property (nonatomic, weak) id<SHSlideMenuDelegate> delegate;
 @property (nonatomic) NSArray *menuArray;
 
+-(void)selectItem:(int)index;
+
 @end
 
 

@@ -8,7 +8,7 @@
 
 #import "SHShadowLayer.h"
 #import "SHSquareButton.h"
-
+//这个还没有看懂，不知道做什么的，应该是主界面六个按钮的阴影
 @implementation SHShadowLayer
 
 -(void)drawInContext:(CGContextRef)ctx {

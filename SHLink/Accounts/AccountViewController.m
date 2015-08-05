@@ -36,6 +36,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.title = @"修改账户";
+
     [self setup];
 }
 
@@ -54,11 +56,11 @@
 
 - (void)setup {
     
-    _currentAccountTF.shLeftImage = [UIImage imageNamed:@"iconTest3"];
-    _currentPswTF.shLeftImage = [UIImage imageNamed:@"iconTest3"];
-    _accountTF.shLeftImage = [UIImage imageNamed:@"iconTest3"];
-    _pswTF.shLeftImage = [UIImage imageNamed:@"iconTest3"];
-    _retypePswTF.shLeftImage = [UIImage imageNamed:@"iconTest3"];
+    _currentAccountTF.shLeftImage = [UIImage imageNamed:@"login"];
+    _currentPswTF.shLeftImage = [UIImage imageNamed:@"password"];
+    _accountTF.shLeftImage = [UIImage imageNamed:@"login"];
+    _pswTF.shLeftImage = [UIImage imageNamed:@"password"];
+    _retypePswTF.shLeftImage = [UIImage imageNamed:@"password"];
     
     hud = [[MBProgressHUD alloc] initWithWindow:[UIApplication sharedApplication].keyWindow];
     hud.labelText = @"正在设置…";

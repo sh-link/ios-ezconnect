@@ -9,17 +9,4 @@
 #import "SHDevice.h"
 
 @implementation SHDevice
-
--(void)setUsername:(NSString *)username {
-    _username = username;
-}
-
--(void)setPassword:(NSString *)password {
-    _password = password;
-}
-
-- (void)gitdiff {
-    
-}
-
 @end

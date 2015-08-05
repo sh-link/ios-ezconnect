@@ -8,14 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface SHMenuCell : UIView
-
-@property (nonatomic) SEL selector;
-
+@interface SHMenuCell : UIControl
 @property (nonatomic) NSString *title;
-
 @property (nonatomic) UIImage *image;
-
-@property (nonatomic, weak) id caller;
-
+-(void)setNumber:(int)number;
+-(void)hideNumber;
 @end

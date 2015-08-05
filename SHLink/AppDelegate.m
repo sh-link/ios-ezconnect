@@ -7,90 +7,75 @@
 //
 
 #import "AppDelegate.h"
-
+#import "Reachability.h"
+#import "DialogUtil.h"
+#import "SHRouter.h"
+#import "UpdateOSViewController.h"
+#import "SHSetupTabBarController.h"
+#import "MessageUtil.h"
 @interface AppDelegate ()
 
 @end
 
 @implementation AppDelegate
-
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    
+    [UINavigationBar appearance].translucent = NO;
+    //设置导航栏背景
     [[UINavigationBar appearance] setBackgroundImage:[self genBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-    
+    //[[UINavigationBar appearance]setBackgroundImage:[UIImage imageNamed:@"navigator_bar"] forBarMetrics:UIBarMetricsDefault];
+    //设置状态栏样式，颜色为白色，需要在info.plist文件中添加一个键值对View controller-based status bar appearance = NO,意思是禁止控制器控制状态栏，交给application管理
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
-    
+    //设置导航栏标题文字属性
     [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName: [UIColor whiteColor],NSFontAttributeName: [UIFont fontWithName:@"Helvetica-Bold" size:20.0]}];
-    
+    //设置导航栏上返回项的文字颜色
     [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]];
-    
-    [[UITabBar appearance] setTintColor:[UIColor colorWithRed:96.0/255 green:189.0/255 blue:179.0/255 alpha:1.0f]];
-    
-    
-//    [[UITabBar appearance] setTintColor:[UIColor whiteColor]];
-
-    
     return YES;
 }
-
 - (void)applicationWillResignActive:(UIApplication *)application {
-    // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-    // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
+    DLog(@"程序将要失去焦点");
 }
-
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
-    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+    DLog(@"程序将要进入后台");
 }
-
 - (void)applicationWillEnterForeground:(UIApplication *)application {
-    // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+    DLog(@"程序将要进入前台");
 }
-
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+    DLog(@"程序已经获取焦点");
 }
-
 - (void)applicationWillTerminate:(UIApplication *)application {
-    // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    DLog(@"程序将要终止");
 }
-
+//创建导航条背景
 - (UIImage *)genBarBackgroundImage {
-    
     static dispatch_once_t onceToken;
     static UIImage *image;
+    //单例
     dispatch_once(&onceToken,^{
-        
         CGFloat imageWidth = [UIScreen mainScreen].bounds.size.width;
-        CGFloat imageHeight = 100;
+        CGFloat imageHeight = 1;
         size_t bytesPerRow = 4 * imageWidth;
-        
         CGContextRef ctx = NULL;
+        // 创建色彩空间对象
         CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-        
-        ctx = CGBitmapContextCreate(NULL, imageWidth, imageHeight, 8, bytesPerRow, colorSpace, (CGBitmapInfo)kCGImageAlphaPremultipliedLast);
-        
-        size_t gradLocationsNum = 2;
+        //创建一个位图上下文
+        ctx = CGBitmapContextCreate(NULL, imageWidth, imageHeight, 8, bytesPerRow, colorSpace, (CGBitmapInfo) kCGImageAlphaPremultipliedLast);
         CGFloat gradLocations[2] = {0.0f, 1.0f};
-        CGFloat gradColors[8] = {64.0/255.0f,168.0/255.0f,155.0/255.0f,1.0f,
-            36.0/255.0f,89.0/255.0f,116.0/255.0f,1.0f};
-        
-        CGGradientRef gradient = CGGradientCreateWithColorComponents(colorSpace, gradColors, gradLocations, gradLocationsNum);
-        
+        CGFloat gradColors[8] = {
+            136.0/255.0f,216.0/255.0f,63.0/255.0f,1.0f,100.0/255.0f,180.0/255.0f,70.0/255.0f,1.0f};
+        //创建渐变
+        CGGradientRef gradient = CGGradientCreateWithColorComponents(colorSpace, gradColors, gradLocations,  kCGImageAlphaPremultipliedLast);
         CGContextDrawLinearGradient(ctx, gradient, CGPointMake(0, imageHeight/2.0), CGPointMake(imageWidth, imageHeight/2.0), kCGGradientDrawsAfterEndLocation);
-        
+        //创建一个位图
         CGImageRef cgImage = CGBitmapContextCreateImage(ctx);
         image = [UIImage imageWithCGImage:cgImage];
-        
+        //释放资源
         CGColorSpaceRelease(colorSpace);
         CGContextRelease(ctx);
         CGImageRelease(cgImage);
-        
     });
-    
     return image;
-    
 }
+
 
 @end

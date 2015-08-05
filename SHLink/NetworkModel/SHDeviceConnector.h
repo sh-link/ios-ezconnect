@@ -8,17 +8,10 @@
 
 #import <Foundation/Foundation.h>
 #import "SHDevice.h"
-
+#import "ErrorUtil.h"
 #define SHErrorDomain @"com.shRouter.error"
 
-typedef NS_ENUM(NSInteger, SHErrorCode) {
-    SHError_Socket_Error = -1,
-    SHError_Unreachable = -2,
-    SHerror_Timeout = -3,
-    SHError_User_Not_Exist = 3,
-    SHerror_Wrong_Password = 4,
-    SHerror_Command_Failed = 5,
-};
+
 
 @protocol SHDeviceSearcherDelegate;
 

@@ -10,7 +10,8 @@
 #import "PureLayout.h"
 #import "SHSearchRoationLayer.h"
 #import "SHRouter.h"
-
+#import "MJRefresh.h"
+#import "UIView+Extension.h"
 typedef NS_ENUM(int, _STATE) {
     _stateLoding,
     _stateSuccess,
@@ -49,6 +50,7 @@ typedef NS_ENUM(int, _STATE) {
 
 @property (weak, nonatomic) IBOutlet UIView *wlanConfigView;
 @property (weak, nonatomic) IBOutlet UIView *wanConfigView;
+@property (weak, nonatomic) IBOutlet UILabel *onlinestate;
 
 @property (nonatomic) _STATE state;
 
@@ -61,7 +63,16 @@ typedef NS_ENUM(int, _STATE) {
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.title = @"网络信息";
     [self setup];
+    //监听
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:UIApplicationDidBecomeActiveNotification object:nil];
+    [_scrollView addLegendHeaderWithRefreshingBlock:^{
+        //
+        [self refresh];
+    }];
+    
+    _onlinestate.textColor = [UIColor redColor];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -83,7 +94,6 @@ typedef NS_ENUM(int, _STATE) {
 }
 
 - (void)setup {
-    
     SHSearchRoationLayer *wlanSearchLayer = [SHSearchRoationLayer layer];
     SHSearchRoationLayer *wanSearchLayer = [SHSearchRoationLayer layer];
     
@@ -142,13 +152,13 @@ typedef NS_ENUM(int, _STATE) {
     [_wanConfigView addSubview:_wanNotConnectedLB];
     [_wlanConfigView addSubview:_wlanFailedLB];
     
-    _wlanConfigView.layer.shadowRadius = 5;
-    _wlanConfigView.layer.shadowOffset = CGSizeMake(3, 3);
-    _wlanConfigView.layer.shadowOpacity = 0.3;
-    
-    _wanConfigView.layer.shadowRadius = 5;
-    _wanConfigView.layer.shadowOffset = CGSizeMake(3, 3);
-    _wanConfigView.layer.shadowOpacity = 0.3;
+//    _wlanConfigView.layer.shadowRadius = 5;
+//    _wlanConfigView.layer.shadowOffset = CGSizeMake(3, 3);
+//    _wlanConfigView.layer.shadowOpacity = 0.3;
+//    
+//    _wanConfigView.layer.shadowRadius = 5;
+//    _wanConfigView.layer.shadowOffset = CGSizeMake(3, 3);
+//    _wanConfigView.layer.shadowOpacity = 0.3;
     
 }
 
@@ -187,6 +197,32 @@ typedef NS_ENUM(int, _STATE) {
                     _dns2LB.text = [NSString stringWithFormat:@"DNS2: %@",router.dns2];
                     _txCountLB.text = [NSString stringWithFormat:@"已发送数据包: %lld",router.txPktNum];
                     _rxCountLB.text = [NSString stringWithFormat:@"已接收数据包: %lld",router.rxPktNum];
+                    if(router.WAN_INET_STAT == 0)
+                    {
+                        _onlinestate.hidden = TRUE;
+                        
+                    }
+                    else
+                    {
+                        _onlinestate.hidden = FALSE;
+                        
+                        if(router.WAN_INET_STAT == 1)
+                        {
+                            _onlinestate.text = @"pppoe用户名密码错误";
+                        }
+                        else if(router.WAN_INET_STAT == 2)
+                        {
+                            _onlinestate.text = @"pppoe服务器无响应";
+                        }
+                        else if(router.WAN_INET_STAT == 3)
+                        {
+                            _onlinestate.text = @"pppoe服务器未知错务";
+                        }
+                        else if(router.WAN_INET_STAT == 4)
+                        {
+                            _onlinestate.text = @"您可能选择了错误的上网方式";
+                        }
+                    }
                     
                 } else {
                     
@@ -200,11 +236,12 @@ typedef NS_ENUM(int, _STATE) {
                     _dns2LB.text = nil;
                     _txCountLB.text = nil;
                     _rxCountLB.text = nil;
-                    
+                    _onlinestate.text = nil;
                 }
                 
                 [self setState:_stateSuccess];
             }
+            [_scrollView.header endRefreshing];
         });
     });
 }
@@ -245,12 +282,14 @@ typedef NS_ENUM(int, _STATE) {
         _dns2LB.hidden = NO;
         _txCountLB.hidden = NO;
         _rxCountLB.hidden = NO;
+        _onlinestate.hidden = NO;
         
         _wlanSearchView.hidden = YES;
         _wanSearchView.hidden = YES;
         
         _wlanFailedLB.hidden = YES;
         _wanFailedLB.hidden = YES;
+        
         
     } else if (state == _stateLoding) {
         
@@ -265,6 +304,7 @@ typedef NS_ENUM(int, _STATE) {
         _dns2LB.hidden = YES;
         _txCountLB.hidden = YES;
         _rxCountLB.hidden = YES;
+        _onlinestate.hidden = YES;
         
         _wlanFailedLB.hidden = YES;
         _wanFailedLB.hidden = YES;
@@ -285,13 +325,13 @@ typedef NS_ENUM(int, _STATE) {
         _dns2LB.hidden = YES;
         _txCountLB.hidden = YES;
         _rxCountLB.hidden = YES;
+        _onlinestate.hidden = YES;
         
         _wlanSearchView.hidden = YES;
         _wanSearchView.hidden = YES;
         
         _wlanFailedLB.hidden = NO;
         _wanFailedLB.hidden = NO;
-        
     }
     
 }

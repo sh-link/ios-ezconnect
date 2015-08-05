@@ -1,4 +1,4 @@
-//
+
 //  SHMenuCell.m
 //  SHLink
 //
@@ -10,14 +10,15 @@
 #import "SHSquareButton.h"
 #import "SHShadowLayer.h"
 
-#define buttonPadding 5.0
+#define padding 10
 #define labelHeight 20.0
-
+//主功能界面的几个button
 @implementation SHMenuCell
 {
-    SHSquareButton *_button;
-    SHShadowLayer *_shadowLayer;
+    UIImageView *_imgView;
     UILabel *_label;
+    UIView *_centerContainer;
+    UILabel *_number;
 }
 
 -(instancetype)initWithFrame:(CGRect)frame {
@@ -46,54 +47,73 @@
 
 - (void)setUp {
     
-    _button = [[SHSquareButton alloc] initWithFrame:CGRectZero];
-    _button.showsTouchWhenHighlighted = YES;
-    
-    
-    _shadowLayer = [SHShadowLayer layer];
-    
-    _label = [[UILabel alloc] initWithFrame:CGRectZero];
-    _label.font = [UIFont fontWithName:@"Helvetica-Bold" size:15.0];
-    _label.textColor = [UIColor colorWithRed:130.0/255.0 green:130.0/255.0 blue:130.0/255.0 alpha:1.0f];
+    _imgView = [[UIImageView alloc]init];
+    _label = [[UILabel alloc]init];
+    _label.font = [UIFont systemFontOfSize:13.0f];
+    [_label setTextColor:getColor(0, 0, 0, 225)];
     [_label setTextAlignment:NSTextAlignmentCenter];
-    
-    [self.layer addSublayer:_shadowLayer];
-    [self addSubview:_button];
-    [self addSubview:_label];
+    _centerContainer = [[UIView alloc]init];
+    _centerContainer.userInteractionEnabled = false;
+    [_centerContainer addSubview:_imgView];
+    [_centerContainer addSubview:_label];
+    [self addSubview:_centerContainer];
+    _number = [[UILabel alloc]init];
+    _number.hidden = true;
+    [_centerContainer addSubview:_number];
+    [_number setTextAlignment:NSTextAlignmentCenter];
+    [_number setTextColor:getColor(169, 204, 91, 255)];
+    [_number setFont:[UIFont systemFontOfSize:12]];
     
 }
 
 - (void)layoutSubviews {
-    [super layoutSubviews];
-    
-    CGFloat buttonWidth = CGRectGetWidth(self.frame) - 2 * buttonPadding;
-    CGRect buttonFrame = CGRectMake(buttonPadding, buttonPadding, buttonWidth, buttonWidth);
-    
-    _shadowLayer.frame = buttonFrame;
-    _button.frame = buttonFrame;
-    
+    _centerContainer.center = CGPointMake(self.frame.size.width / 2.0, self.frame.size.height / 2.0);
+    _centerContainer.bounds = CGRectMake(0, 0, self.frame.size.width / 3.0 * 2, self.frame.size.height / 3.0 * 2);
+    CGFloat buttonWidth = CGRectGetWidth(_centerContainer.frame) - 2 * padding;
+    _imgView.frame = CGRectMake(padding, padding, buttonWidth, buttonWidth);
     CGFloat labelExtra = 20;
-    CGRect labelFrame = CGRectMake(- labelExtra, 3 * buttonPadding + buttonWidth, CGRectGetWidth(self.frame) + 2 * labelExtra, labelHeight);
-    _label.frame = labelFrame;
+    _label.frame = CGRectMake(-labelExtra, padding + buttonWidth, CGRectGetWidth(_centerContainer.frame) + 2 * labelExtra, _centerContainer.frame.size.height - buttonWidth - 2 * padding);
     
-    [_shadowLayer setNeedsDisplay];
+    _number.frame = CGRectMake(CGRectGetMaxX(_imgView.frame), _imgView.frame.origin.y, 10, 10);
 }
 
 - (void)setTitle:(NSString *)title {
-    _label.text = title;
+    [_label setText:title];
+    _title = title;
 }
 
 - (void)setImage:(UIImage *)image {
-    [_button setImage:image forState:UIControlStateNormal];
+    _image = image;
+    [_imgView setImage:image];
 }
 
-- (void)setSelector:(SEL)selector {
-    _selector = selector;
-    [_button addTarget:_caller action:_selector forControlEvents:UIControlEventTouchUpInside];
+- (BOOL)beginTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event
+{
+    DLog(@"beginTrackingWithTouch");
+    self.backgroundColor = getColor(225, 225, 225, 225);
+    return true;
 }
 
-- (void)tapped {
+-(BOOL)continueTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event
+{
+    DLog(@"continueTrackingWithTouch");
+    return true;
+}
+-(void)endTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event
+{
+    DLog(@"endTrackingWithTouch");
+    self.backgroundColor = getColor(255, 255, 255, 255);
+}
+
+-(void)hideNumber
+{
+    _number.hidden = true;
+}
+
+-(void)setNumber:(int)number
+{
+    _number.hidden = false;
     
+    [_number setText:[NSString stringWithFormat:@"%d", number]];
 }
-
 @end

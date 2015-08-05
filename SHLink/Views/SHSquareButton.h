@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#define Radius 15.0
+#define Radius 5.0
 
 @interface SHSquareButton : UIButton
 

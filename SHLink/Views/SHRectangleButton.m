@@ -8,16 +8,18 @@
 
 #import "SHRectangleButton.h"
 #import "SHSearchRoationLayer.h"
+#import "ImageUtil.h"
 
-#define Radius 10.0
+#define Radius 5.0
 #define searchingPadding 3.0
-
+//这个应该是有搜索圆圈的那个按钮
 @implementation SHRectangleButton
 {
     SHSearchRoationLayer *_searchLayer;
 }
 
--(instancetype)initWithFrame:(CGRect)frame {
+
+-(id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
         [self setUp];
@@ -50,12 +52,17 @@
         self.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:17.0];
     }
     
-    [self setTitleColor:[UIColor colorWithRed:66.0/255 green:167.0/255 blue:156.0/255 alpha:1.0f] forState:UIControlStateNormal];
+    [self setTitleColor:[UIColor colorWithRed:255.0/255 green:255.0/255 blue:255.0/255 alpha:1.0f] forState:UIControlStateNormal];
     
-    self.showsTouchWhenHighlighted = YES;
+    [self setBackgroundImage:[ImageUtil imageWithColor:getColor(136, 196, 63, 255) andSize:CGSizeMake(1, 1)] forState:UIControlStateNormal];
+    [self setBackgroundImage:[ImageUtil imageWithColor:getColor(136, 216, 63, 255) andSize:CGSizeMake(1, 1)] forState:UIControlStateHighlighted];
+    UIImage *img = [ImageUtil imageWithColor:getColor(136, 196, 63, 255) andSize:CGSizeMake(1, 1)];
+    DLog(@"%f %f", img.size.width, img.size.height);
+    //self.showsTouchWhenHighlighted = YES;
     self.inSearching = NO;
     
     _searchLayer = [SHSearchRoationLayer layer];
+    _searchLayer.backgroundColor = [UIColor clearColor].CGColor;
     _searchLayer.frame = CGRectMake(0, 0, 30, 30);
     
     
@@ -67,33 +74,36 @@
     
     self.layer.cornerRadius = Radius;
     self.layer.masksToBounds = YES;
-    CGContextRef contex = UIGraphicsGetCurrentContext();
+    //136/196/63
     
-    size_t gradLocationsNum = 2;
-    CGFloat gradLocations[2] = {0.0f, 1.0f};
-    CGFloat gradColors[8] = {1.0f,1.0f,1.0f,1.0f,
-                        0.85f,0.85f,0.85f,1.0f};
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    //self.layer.backgroundColor = [UIColor colorWithRed:136/255.0 green:196/255.0 blue:63/255.0 alpha:1.0f].CGColor;
+//    CGContextRef context = UIGraphicsGetCurrentContext();
+//    
+//    size_t gradLocationsNum = 2;
+//    CGFloat gradLocations[2] = {0.0f, 1.0f};
+//    CGFloat gradColors[8] = {1.0f,1.0f,1.0f,1.0f,
+//                        0.99f,0.0f,0.0f,1.0f};
+//    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+//    
+//    CGGradientRef gradient = CGGradientCreateWithColorComponents(colorSpace, gradColors, gradLocations, gradLocationsNum);
+//    
+//    CGContextDrawLinearGradient(context, gradient, CGPointMake(CGRectGetMidX(rect), 0), CGPointMake(CGRectGetMidX(rect), CGRectGetMaxY(rect)), kCGGradientDrawsAfterEndLocation);
+//    
+//    CGColorSpaceRelease(colorSpace);
+//    CGGradientRelease(gradient);
     
-    CGGradientRef gradient = CGGradientCreateWithColorComponents(colorSpace, gradColors, gradLocations, gradLocationsNum);
-    
-    CGContextDrawLinearGradient(contex, gradient, CGPointMake(CGRectGetMidX(rect), 0), CGPointMake(CGRectGetMidX(rect), CGRectGetMaxY(rect)), kCGGradientDrawsAfterEndLocation);
-    
-    CGColorSpaceRelease(colorSpace);
-    CGGradientRelease(gradient);
-    
-    CGContextSetStrokeColorWithColor(contex, [UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha:0.2].CGColor);
-    CGContextSetLineWidth(contex, 2);
-    
-    CGContextBeginPath(contex);
-    
-    CGPathRef path = [UIBezierPath bezierPathWithRoundedRect:CGRectInset(rect, 0.5, 0.5) cornerRadius:Radius].CGPath;
-    
-    CGContextAddPath(contex, path);
-    
-    CGContextClosePath(contex);
-    
-    CGContextStrokePath(contex);
+//    CGContextSetStrokeColorWithColor(contex, [UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha:0.2].CGColor);
+//    CGContextSetLineWidth(contex, 2);
+//    
+//    CGContextBeginPath(contex);
+//    //生成一个比按钮rect矩形内缩0.5带圆角的矩形的路径
+//    CGPathRef path = [UIBezierPath bezierPathWithRoundedRect:CGRectInset(rect, 0.2, 0.2) cornerRadius:Radius].CGPath;
+//    
+//    CGContextAddPath(contex, path);
+//    
+//    CGContextClosePath(contex);
+//    
+//    CGContextStrokePath(contex);
     
     CGRect titleRect = [self titleRectForContentRect:rect];
     CGFloat searchingWidth = CGRectGetHeight(rect) - searchingPadding * 2.0;
@@ -136,5 +146,7 @@
     self.titleLabel.font = shFont;
     [self setNeedsDisplay];
 }
+
+
 
 @end

@@ -12,7 +12,7 @@
 #define padding 5.5
 
 @implementation SHTextField
-
+// 这是一个左边有图片，右边输入文字的文本框
 -(instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
@@ -40,13 +40,16 @@
 - (void)setUp {
     self.textColor = [UIColor colorWithRed:85.0/255.0 green:85.0/255.0 blue:85.0/255.0 alpha:1.0];
     self.font = [UIFont fontWithName:@"Helvetica" size:15.0];
+    self.layer.cornerRadius = 5.0f;
+    self.clearButtonMode = UITextFieldViewModeAlways;
+    
 }
 
 -(CGRect)textRectForBounds:(CGRect)bounds {
     CGFloat leftViewWidth = CGRectGetHeight(bounds) - padding * 2.0;
 
-    CGRect textRect = CGRectMake(padding * 3 + leftViewWidth, 0, CGRectGetWidth(bounds) - padding * 3 - leftViewWidth, CGRectGetHeight(bounds));
-    
+    CGRect textRect = CGRectMake(padding * 3 + leftViewWidth, 0, CGRectGetWidth(bounds) - padding * 3 - leftViewWidth - 50, CGRectGetHeight(bounds));
+
     if (!_shLeftImage) {
         return CGRectMake(padding, 0, CGRectGetWidth(bounds) - padding, CGRectGetHeight(bounds));
     }
@@ -77,12 +80,14 @@
     
     return leftRect;
 }
-
+//设置左边图片
 -(void)setShLeftImage:(UIImage *)shLeftImage {
     _shLeftImage = shLeftImage;
     
     if (shLeftImage) {
-        self.leftView = [[UIImageView alloc] initWithImage:shLeftImage];
+        UIImageView *leftImg = [[UIImageView alloc] initWithImage:shLeftImage];
+        leftImg.contentMode = UIViewContentModeScaleAspectFit;
+        self.leftView = leftImg;
         self.leftViewMode = UITextFieldViewModeAlways;
     }else {
         self.leftView = nil;
@@ -93,7 +98,7 @@
 }
 
 -(void)shakeWithText:(NSString *)text {
-    
+    //TextView晃动
     CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"transform.translation.x"];
     CGFloat currentTx = self.transform.tx;
     
@@ -102,7 +107,7 @@
     animation.keyTimes = @[ @(0), @(0.225), @(0.425), @(0.6), @(0.75), @(0.875), @(1) ];
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     [self.layer addAnimation:animation forKey:@"kAFViewShakerAnimationKey"];
-    
+    //提示框
     if (text) {
         CMPopTipView *tip = [[CMPopTipView alloc] initWithMessage:text];
         [tip setBackgroundColor:[UIColor whiteColor]];
@@ -110,13 +115,12 @@
         [tip setDismissTapAnywhere:YES];
         [tip setHas3DStyle:NO];
         [tip setHasShadow:YES];
-        [tip setPointerSize:6.0];
+        [tip setPointerSize:5];
         [tip setTextColor:[UIColor colorWithRed:120.0/255 green:120.0/255 blue:120.0/255 alpha:1.0]];
         [tip setHasGradientBackground:NO];
         [tip presentPointingAtView:self inView:self.superview animated:YES];
         [tip autoDismissAnimated:YES atTimeInterval:1.5];
     }
-
 }
 
 @end
